@@ -21,6 +21,8 @@ void m1() {
   scanf("%i",&config[3]);
   p("\n");
 
+  mapeo(config);
+
 }
 
 // Módulo de bloques (inicializador)
@@ -76,7 +78,9 @@ void m3() {
 // __ini__
 int main() {
 
-  system("cls");
+  printf("%i\n",8192 >> 16 );
+
+  /*system("cls");
   short int op;
   int options[3] = {1,2,3};
 
@@ -103,6 +107,6 @@ int main() {
       break;
     }
   } while(!in_array(op,options,3));
-
+*/
   return 1;
 }
