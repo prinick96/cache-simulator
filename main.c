@@ -75,7 +75,7 @@ void m3() {
 
 // __ini__
 int main() {
-  
+
   system("cls");
   short int op;
   int options[3] = {1,2,3};
