@@ -80,7 +80,8 @@ void FIFO(int **cache, int *puntero, int n, int conjunto, int mC, int *fallas, i
     Aquí se identificará la falla forzosa y falla por conflicto.
     También se determina si hubo un acierto.
     Se coloca el elemento "n" en el caché.
-    Se elimina el primero en entrar y se corre el puntero en caso de que haya falla por conflicto.
+    Se elimina el primero en entrar si el conjunto está full y se
+    corre el puntero en caso de que haya falla por conflicto.
   */
   else {
 
@@ -109,7 +110,7 @@ void FIFO(int **cache, int *puntero, int n, int conjunto, int mC, int *fallas, i
     }
 
     /*
-      Si recorrió toda la memoria caché, no hubo coincidencias y tampoco hubo espacio vacío.
+      Si recorrió toda la memoria caché en el conjunto, no hubo coincidencias y tampoco hubo espacio vacío.
       Entonces se genera una falla por conflicto y hay que sustituir al primero que entró y correr
       el puntero al que entro depués.
     */
@@ -137,13 +138,71 @@ void FIFO(int **cache, int *puntero, int n, int conjunto, int mC, int *fallas, i
 
 }
 
+/**
+  * Política de reemplazo en CACHÉ, se asigna de forma aleatoria una entrada.
+  *
+  * @param int **cache: Estructura de caché entera.
+  * @param int n: El número a buscar en caché.
+  * @param int conjunto: Conjunto en el que pertenece n.
+  * @param int mC: Memoria caché (para saber el extremo)
+  * @param int *fallas: Arreglo con conteo de fallas (los tres tipos).
+  * @param int *aciertos (por referencia): Integer con conteo de aciertos.
+*/
+void RANDOM(int **cache, int n, int conjunto, int mC, int *fallas, int *aciertos) {
+  int counter = 0;
+  /*
+    Recorremos la memoria caché en el conjunto indicado, buscando espacios vacíos.
+    Aquí se identificará la falla forzosa y falla por conflicto.
+    También se determina si hubo un acierto.
+    Se coloca el elemento "n" en el caché.
+    Se elimina de forma aleatoria un elemento, si el conjunto está full y no hay espacio para el nuevo elemento.
+  */
+  for(int i = 0; i < mC; i++) {
+    /*
+      Si la posición está vacía, entonces se asigna el elemento a esa posición,
+      genera un falla forzosa y detenemos el recorrido del caché.
+    */
+    if(cache[conjunto][i] == 0) {
+      printf("\n%i falla forzosa",n);
+      cache[conjunto][i] = n;
+      fallas[0]++;
+      break;
+    }
+
+    /*
+      Si el elemento ya está en el caché, entonces generamos un acierto y detenemos
+      el recorrido del caché.
+    */
+    else if(cache[conjunto][i] == n) {
+      printf("\n%i acierto",n);
+      *aciertos = *(aciertos) + 1;
+      break;
+    }
+
+    counter++;
+  }
+
+  /*
+    Si recorrió toda la memoria caché en el conjunto, no hubo coincidencias y tampoco hubo espacio vacío.
+    Entonces se genera una falla por conflicto y hay que sustituir de forma aleatoria algún elemento por n.
+  */
+  if(counter == mC) {
+    //Obtenemos una posición aleatoria
+    int position = randomize(mC);
+
+    //Generamos la falla por conflicto
+    fallas[2]++;
+    printf("\n%i falla por conflicto (-%i)",n,cache[conjunto][position]);
+
+    cache[conjunto][position] = n;
+  }
+
+}
+
 void LRU() {
 
 }
 
-void RAND() {
-
-}
 
 void simulador(int *config) {
 
@@ -213,7 +272,7 @@ void simulador(int *config) {
           FIFO(cache,punteroFifo,number,conjunto_position,mC,fallas,&aciertos);
         break;
         default:
-          RAND();
+          RANDOM(cache,number,conjunto_position,mC,fallas,&aciertos);
         break;
       }
 
@@ -234,6 +293,8 @@ void simulador(int *config) {
   free(punteroFifo);
 
   //Fin
-  p("\nTermino la simulacion");
+  p("\nTermino la simulacion\n");
+
+  returnMenu();
 
 }

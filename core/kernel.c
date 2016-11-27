@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <time.h> //para meter en el random
 
 //Macros
 #define TRUE 1
@@ -21,6 +22,7 @@ int binToInt(char *bin, int size);
 void p(char *string);
 int main();
 void returnMenu();
+int randomize(int cantidad);
 
 /**
   * @param int N: Recibe un número que se puede expresar en base de 2^n
@@ -213,6 +215,12 @@ void returnMenu(){
   } else {
     exit(1);
   }
+}
+
+//Genera un número random entre 0 y cantidad-1
+int randomize(int cantidad) {
+  srand(time(NULL));
+  return rand() % cantidad;
 }
 
 //Inclusión de archivos
