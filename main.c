@@ -165,7 +165,7 @@ int main() {
       default:
         // No existe el módulo solicitado a través de "short int op"
         system(CLS);
-        p("Módulo inexistente. \n\n");
+        p("Modulo inexistente. \n\n");
       break;
     }
   // Si lo elegido no está en el arreglo de opciones posibles {1,2,3}

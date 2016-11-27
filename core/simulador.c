@@ -30,6 +30,8 @@ void showCache(int **cache, int C, int mC) {
 void showStats(int *fallas, int solicitudes, int aciertos) {
 
   int fallasTotal = fallas[0] + fallas[1] + fallas[2];
+  float tasaFallas = (fallasTotal * 100) / solicitudes;
+  float tasaAciertos = (aciertos * 100) / solicitudes;
 
   p("\n\nESTADISTICAS\n");
   printf("  -Total de solicitudes de cache: %i\n",solicitudes);
@@ -37,10 +39,10 @@ void showStats(int *fallas, int solicitudes, int aciertos) {
   printf("    +Fallas forzosas: %i\n",fallas[0]);
   printf("    +Fallas por capacidad: %i\n",fallas[1]);
   printf("    +Fallas por conflicto: %i\n",fallas[2]);
-  printf("    +Tasa de fallas: %f\n", ((fallasTotal/solicitudes)*100));
+  printf("    +Tasa de fallas: %f \n", tasaFallas);
   printf("  -Aciertos:\n");
   printf("    +Total aciertos: %i\n",aciertos);
-  printf("    +Tasa de aciertos: %f\n", ((aciertos/solicitudes)*100));
+  printf("    +Tasa de aciertos: %f \n", tasaAciertos);
   p("\n\n");
 }
 
