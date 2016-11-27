@@ -90,14 +90,9 @@ void m2(int *config) {
 
   p("\nDireccion (en decimal): ");
   scanf("%i",&config[5]);
-  if(config[5] < 0) {
-    config[5] *= -1;
-    p("La direccion debe ser un numero Entero Positivio, ");
-    printf("se ha asignado %i\n",config[5]);
-  }
   p("\n");
 
-  mapeo(config,1);
+  mapeo(config,1,1);
 
 }
 
@@ -107,33 +102,42 @@ void m2(int *config) {
 */
 void m3(int *config) {
 
-  p("Memoria Cache en Bytes: ");
+  //Valores posibles de Memoria Caché (en Bytes)
+  int mCOptions[6] = {4,8,16,32,64,128};
+  // Conjuntos posibles
+  int cOptions[4] = {2,4,8,16};
+  // Políticas de reemplazo
+  int rOptions[3] = {0,1,2};
+
+  p("Memoria Cache (en bloques): ");
   scanf("%i",&config[0]);
+  //Chequeo de parámetros de entrada
+  config = iReplace(config,mCOptions,4,0,6);
   p("\n");
 
-  p("Cantidad de conjuntos: ");
+  p("Tamanio de conjuntos (2,4, 8 u 16): ");
   scanf("%i",&config[1]);
+  config = iReplace(config,cOptions,2,1,4);
   p("\n");
 
-  p("Política de reemplazo (0) LRU (1) FIFO (2) RAND: ");
+  p("Politica de reemplazo (0) LRU (1) FIFO (2) RAND: ");
   scanf("%i",&config[2]);
+  config = iReplace(config,rOptions,0,2,3);
   p("\n");
 
-  /*p("Secuencia de direcciones (separar por comas): ");
-  scanf("%s",&secuencias);
-  p("\n");*/
+  simulador(config);
 
 }
 
 // __ini__
 int main() {
-  system("cls");
+  system(CLS);
   // Variable para capturar la opción del menú
   short int op;
   // Opciones posibles
   int options[3] = {1,2,3};
   // Configuración
-  int config[5];
+  int config[6];
 
   // Estructura repetitiva del menú
   do {
@@ -141,14 +145,14 @@ int main() {
     p(" (0) Modulo de mapeo \n (1) Modulo de bloques \n (2) Simulador de reemplazo\n Seleccionar: ");
     scanf("%i",&op);
 
-    system("cls");
+    system(CLS);
     p("-----Indicar la configuracion-----\n\n");
 
     // Selector del módulo
     switch (op) {
       case 0:
         // Función de mapeo
-        mapeo( basics(config) , 0 );
+        mapeo( basics(config) , 0 , 1);
       break;
       case 1:
         // Ubicación de bloques
@@ -160,7 +164,7 @@ int main() {
       break;
       default:
         // No existe el módulo solicitado a través de "short int op"
-        system("cls");
+        system(CLS);
         p("Módulo inexistente. \n\n");
       break;
     }

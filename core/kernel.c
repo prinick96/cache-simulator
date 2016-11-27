@@ -6,12 +6,14 @@
 //Macros
 #define TRUE 1
 #define FALSE 0
+#define CLS "cls"
 
 //Instance
 void getUnity(int *unity, int *uOptions, char *type);
 int setUnity(int N, int U);
 int expoDos(int N);
 int *iReplace(int *config, int *options, int D, int N, int nOptions);
+int **create_cache_struct(int fil, int col);
 char *create_memory_struct(int N);
 short int in_array(int e, int *vector, int N);
 char *bin(int n, int BITS);
@@ -32,6 +34,26 @@ int expoDos(int N) {
   }
 
   return n - 1;
+}
+
+/**
+  * Crea una estructura de tipo caché (matriz fil*col) en tiempo de ejecución.
+  * Retorna una matriz NO dinámica, con fil y col de tamaño.
+*/
+int **create_cache_struct(int fil, int col) {
+    int **m = NULL;
+
+    // Se crea la malla
+    m = (int**) calloc(fil, sizeof(int *));
+
+    //Se reserva memoria para la tabla de punteros intermedia
+    if (NULL != m){
+        for (int i= 0 ; i < fil; i++){
+          m[i] = (int *) calloc(col, sizeof(int));
+        }
+    }
+
+    return m;
 }
 
 /**
@@ -85,7 +107,7 @@ int binToInt(char *bin, int size) {
   * Transforma un número decimal a un número binario.
   * @param int n: Entero a transformar
   * @param int BITS: Cantidad de bits de resultado (32 bits por ejemplo)
-  * Retorna un long long en binario
+  * Retorna un char * de tamaño BITS + 1 y el binario con ceros a la izquierda
 */
 char *bin(int n, int BITS) {
    int c, d, count = 0;
@@ -186,7 +208,7 @@ void returnMenu(){
   scanf("%i",&o);
 
   if(o == 1) {
-    system("cls");
+    system(CLS);
     main();
   } else {
     exit(1);
@@ -195,5 +217,4 @@ void returnMenu(){
 
 //Inclusión de archivos
 #include "mapeo.c"
-#include "bloques.c"
 #include "simulador.c"

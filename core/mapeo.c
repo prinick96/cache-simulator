@@ -28,29 +28,36 @@ void showBinaries(char *cache, int begin, int end, int showInternal) {
   * @param int *component: Componentes (TAG,BIC/SIC,WIB)
   * @param int is_sic: Verifica si el componente 1 es un sic o un bic
   * @param int dir: Dirección introducida en el main()
+  * @param int showMessages: Dice si va a mostrar mensajes en pantalla o no.
+  *
+  * @return int position: Retorna la posición del conjunto, si es mapeo directo devuelve 0.
 */
-void showCacheStruct(char *cache, int size, int showInternal, const int *component, const int is_sic, int dir) {
+int showCacheStruct(char *cache, int size, int showInternal, const int *component, const int is_sic, int dir, int showMessages) {
 
   if(1 == showInternal) {
     //Obtengo un binario de "size" bits completado con ceros a la izquierda
     char *mem_dir = bin(dir,size - 1);
+
     //LLenamos el caché
     for(int i = size - 1; i >= 0; i--) {
       cache[i] = mem_dir[(size - 1) - i];
     }
   }
 
-  //Muestra la parte del TAG
-  p("ETIQUETA: ");
-  showBinaries(cache,size - 1,size - component[0],showInternal);
+  // En caso de que se quiera mostrar información en la pantalla
+  if(1 == showMessages) {
+    //Muestra la parte del TAG
+    p("ETIQUETA: ");
+    showBinaries(cache,size - 1,size - component[0],showInternal);
 
-  //Muestra la parte del SIC / BIC según tipo de mapeo
-  p(is_sic ? "CONJUNTO: " : "BLOQUE: ");
-  showBinaries(cache,size - component[0] - 1,component[2],showInternal);
+    //Muestra la parte del SIC / BIC según tipo de mapeo
+    p(is_sic ? "CONJUNTO: " : "BLOQUE: ");
+    showBinaries(cache,size - component[0] - 1,component[2],showInternal);
 
-  //Muestra la parte del WIB
-  p("BYTE: ");
-  showBinaries(cache,component[2] - 1,0,showInternal);
+    //Muestra la parte del WIB
+    p("BYTE: ");
+    showBinaries(cache,component[2] - 1,0,showInternal);
+  }
 
   /** Si showInternal es 1 es porque estamos en el módulo 2,
     * donde hay que indicar la dirección del bloque/conjunto
@@ -68,10 +75,18 @@ void showCacheStruct(char *cache, int size, int showInternal, const int *compone
       mem_cache[y] = (char) cache[i];
     }
 
-    printf("\n\nEl bloque se coloca en el %s %i de la memoria cache.\n", is_sic ? "conjunto" : "bloque" , binToInt(mem_cache, component[1]));
+    int position = binToInt(mem_cache, component[1]);
+
+    if(1 == showMessages) {
+      printf("\n\nEl bloque se coloca en el %s %i de la memoria cache.\n", is_sic ? "conjunto" : "bloque" , position);
+    }
+
+    return position;
   }
 
   p("\n\n");
+
+  return 0;
 }
 
 /**
@@ -97,8 +112,10 @@ TAG | SIC | WIB
   @param int *config: Configuración pedida en el main()
   @param int showInternal: (1) Muestra contenido interno, (0) No muestra contenido interno
 
+  @return int position: Retorna la posición retornada por showCacheStruct()
+
 */
-void mapeo(int *config, int showInternal) {
+int mapeo(int *config, int showInternal, int showMessages) {
 
   int mP = config[1];
   int mC = config[2];
@@ -141,18 +158,25 @@ void mapeo(int *config, int showInternal) {
   char *cache = create_memory_struct(sizeMemory);
 
   // Mostrar la estructura final
-  showCacheStruct(
+  int position = showCacheStruct(
       cache, //caché creado
       sizeMemory, //tamaño del caché creado
       showInternal, //mostrar internamente config[5] (si existe)
       component, //tag,sic/bic,wib
       config[0], //mapeo directo/asociativo por conjunto
-      1 == showInternal ? config[5] : 0 //direccion de búsqueda (si es que se solicitó buscar una dirección)
+      1 == showInternal ? config[5] : 0, //direccion de búsqueda (si es que se solicitó buscar una dirección),
+      showMessages // Si queremos mostrar el mensaje
   );
 
   //Liberamos memoria
   free(cache);
 
-  // Verificar si se quiere regresar al menú
-  returnMenu();
+  if(1 == showMessages) {
+    // Verificar si se quiere regresar al menú
+    p("\n\n");
+    returnMenu();
+  }
+
+  //Retornamos la posición del conjunto
+  return position;
 }
