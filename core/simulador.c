@@ -199,10 +199,115 @@ void RANDOM(int **cache, int n, int conjunto, int mC, int *fallas, int *aciertos
 
 }
 
-void LRU() {
+/**
+  * Política de reemplazo en CACHÉ, se asigna en la posición del más reciente usado.
+  *
+*/
+void LRU(int replace) {
 
 }
 
+/**
+  * Reacomoda colocando el más reciente en entrar, en el tope y corre los que estén arriba
+  * hacia abajo de el.
+  *
+  * @param int *vector: Vector parte del conjunto a ordenar.
+  * @param int position: Posición del elemento a poner en tope.
+  * @param int top: Tope a donde se desea mover.
+*/
+void reacomodar(int *vector, int position, int top) {
+  //Tomamos el elemento a reacomodar
+  int n = vector[position], i,j;
+  //Si ya está en el tope no hacemos nada, pero si no está, hay que colocarlo
+  if(position < top) {
+    //Creamos un arreglo temporal
+    int *tmp = (int *) malloc(sizeof(int) * top);
+    //Tomamos los elementos que estén desde el hacia el tope.
+    for(i = (position + 1), j = 0; i <= top; i++, j++) {
+      tmp[j] = vector[i];
+    }
+    //Ahora los reemplazamos todos
+    for(i = position, j = 0; i < top; i++, j++) {
+      vector[i] = tmp[j];
+    }
+    //Colocamos de tope al elemento que tomamos
+    vector[top] = n;
+  }
+}
+
+/**
+  * Devuelve el número que debe reemplazar LRU en el caché
+  *
+  * @paran int **puntero: Puntero que lleva el control de la pila. (se asume 0 como el fondo de la pila)
+  * @param int C: Cantidad de conjuntos - 1
+  * @param int conjunto: Conjunto en donde se ha de analizar.
+  * @param int n: Número entrando en la secuencia actual.
+  *
+  * @return Devuelve el número que se debe reemplazar en el caché.
+*/
+int getLRU(int **puntero, int C, int conjunto, int n) {
+  int existe = 0, position = 0;
+  //Revisamos si está vacío o hay espacios vacíos
+  for(int i = 0; i <= C; i++, position++) {
+    if(puntero[conjunto][i] == 0) {
+      //Si está vacío, la posición de inserción será i=position y detenemos el bucle;
+      break;
+    }
+  }
+
+  //Determinamos la existencia del elemento en el vector del conjunto de la matriz
+  existe = in_array_position(n,puntero[conjunto],C + 1);
+  //Si es cierto, no está lleno y el elemento NO está en el vector
+  if(position < (C + 1) && -1 == existe) {
+    //Por tanto simplemente colocamos n en el tope
+    puntero[conjunto][position] = n;
+  }
+
+  //Si está lleno, o simplemente existe el elemento hay que reordenar el vector del conjunto
+  else {
+
+    //Si está lleno, position tiene un exceso en 1.
+    if(position == C + 1) {
+      position = C;
+    }
+
+    /*
+      Si está lleno, y el elemento NO existe, hay que ELIMINAR el que está en la posición 0
+      ya que este es el que será retornado y colocar allí el que se está introduciendo en
+      la secuencia, para que así, este pase a estar de primero y se retorn aquí mismo el
+      que estaba en la posición 0.
+    */
+    if(position == C && -1 == existe) {
+      //Tomamos el que está en el fondo
+      int tmp = puntero[conjunto][0];
+      //Reemplazamos el del fondo por el que debe estar en el tope (el que entra en la secuencia)
+      puntero[conjunto][0] = n;
+      //Reacomodamos
+      reacomodar(puntero[conjunto],0,position);
+
+
+      p("\n--------------------- VECTOR ------------------\n");
+      for(int i = C; i >= 0; i--) {
+        printf("%i\n",puntero[conjunto][i]);
+      }
+      p("\n------------------- //VECTOR ------------------\n");
+
+      //Termina el flujo y se retorna el elemento que se va a cambiar
+      return tmp;
+    }
+
+    reacomodar(puntero[conjunto],existe,position);
+  }
+
+  p("\n--------------------- VECTOR ------------------\n");
+  for(int i = C; i >= 0; i--) {
+    printf("%i\n",puntero[conjunto][i]);
+  }
+  p("\n------------------- //VECTOR ------------------\n");
+
+  //Al final siempre estará el elemento a reemplazar en la posición 0 (el fondo)
+  return puntero[conjunto][0];
+}
 
 void simulador(int *config) {
 
@@ -220,6 +325,16 @@ void simulador(int *config) {
   int *punteroFifo = NULL;
   punteroFifo = (int *) malloc(sizeof(int)*C);
 
+  //Puntero de LRU (matriz de Cojunto x Conjunto)
+  int **punteroLRU = create_cache_struct(C,C);
+
+  //Chequeamos el puntero LRU
+  if(NULL == punteroLRU) {
+    p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON LRU()\n");
+    exit(EXIT_FAILURE);
+  }
+
+  //Chequeamos el puntero FIFO
   if(NULL == punteroFifo && 1 == config[2]) {
     p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON FIFO()\n");
     exit(EXIT_FAILURE);
@@ -266,13 +381,30 @@ void simulador(int *config) {
       //Política de reemplazo
       switch (config[2]) {
         case 0:
-          LRU();
+          LRU(
+            getLRU(punteroLRU, C- 1, conjunto_position, number)
+          );
         break;
         case 1:
-          FIFO(cache,punteroFifo,number,conjunto_position,mC,fallas,&aciertos);
+          FIFO(
+            cache,
+            punteroFifo,
+            number,
+            conjunto_position,
+            mC,
+            fallas,
+            &aciertos
+          );
         break;
         default:
-          RANDOM(cache,number,conjunto_position,mC,fallas,&aciertos);
+          RANDOM(
+            cache,
+            number,
+            conjunto_position,
+            mC,
+            fallas,
+            &aciertos
+          );
         break;
       }
 

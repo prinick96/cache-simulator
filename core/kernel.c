@@ -16,6 +16,7 @@ int expoDos(int N);
 int *iReplace(int *config, int *options, int D, int N, int nOptions);
 int **create_cache_struct(int fil, int col);
 char *create_memory_struct(int N);
+int in_array_position(int e, int *vector, int N);
 short int in_array(int e, int *vector, int N);
 char *bin(int n, int BITS);
 int binToInt(char *bin, int size);
@@ -67,6 +68,20 @@ char *create_memory_struct(int N) {
   v = (char*) malloc(N*sizeof(char));
 
   return v;
+}
+
+/**
+  * Define si un elemento entero está dentro de un vector que también es de tipo entero.
+  * Devuelve la posición en la que se encuentra, en caso de que no se encuentre devuelve -1.
+*/
+int in_array_position(int e, int *vector, int N) {
+  for(int i = 0; i < N; i++) {
+    if(e == vector[i]) {
+      return i;
+    }
+  }
+
+  return -1;
 }
 
 /**
