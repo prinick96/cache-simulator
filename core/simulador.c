@@ -202,9 +202,62 @@ void RANDOM(int **cache, int n, int conjunto, int mC, int *fallas, int *aciertos
 /**
   * Política de reemplazo en CACHÉ, se asigna en la posición del más reciente usado.
   *
+  * @param int replace: Número a ser reemplazado
+  * @param int **cache: Estructura de caché entera.
+  * @param int n: El número a buscar en caché.
+  * @param int conjunto: Conjunto en el que pertenece n.
+  * @param int mC: Memoria caché (para saber el extremo)
+  * @param int *fallas: Arreglo con conteo de fallas (los tres tipos).
+  * @param int *aciertos (por referencia): Integer con conteo de aciertos.
 */
-void LRU(int replace) {
+void LRU(int replace, int **cache, int n, int conjunto, int mC, int *fallas, int *aciertos) {
+  int counter = 0;
+  /*
+    Recorremos la memoria caché en el conjunto indicado, buscando espacios vacíos.
+    Aquí se identificará la falla forzosa y falla por conflicto.
+    También se determina si hubo un acierto.
+    Se coloca el elemento "n" en el caché.
+    Se elimina, de acuerdo a LRU un elemento si el caché está full.
+  */
+  for(int i = 0; i < mC; i++) {
+    /*
+      Si la posición está vacía, entonces se asigna el elemento a esa posición,
+      genera un falla forzosa y detenemos el recorrido del caché.
+    */
+    if(cache[conjunto][i] == 0) {
+      printf("\n%i falla forzosa",n);
+      cache[conjunto][i] = n;
+      fallas[0]++;
+      break;
+    }
 
+    /*
+      Si el elemento ya está en el caché, entonces generamos un acierto y detenemos
+      el recorrido del caché.
+    */
+    else if(cache[conjunto][i] == n) {
+      printf("\n%i acierto",n);
+      *aciertos = *(aciertos) + 1;
+      break;
+    }
+
+    counter++;
+  }
+
+  /*
+    Si recorrió toda la memoria caché en el conjunto, no hubo coincidencias y tampoco hubo espacio vacío.
+    Entonces se genera una falla por conflicto y hay que sustituir de forma aleatoria algún elemento por n.
+  */
+  if(counter == mC) {
+    //Obtenemos la posición del número "getLRU()", en el conjunto
+    int position = in_array_position(replace,cache[conjunto],mC);
+
+    //Generamos la falla por conflicto
+    fallas[2]++;
+    printf("\n%i falla por conflicto (-%i)",n,cache[conjunto][position]);
+
+    cache[conjunto][position] = n;
+  }
 }
 
 /**
@@ -285,13 +338,6 @@ int getLRU(int **puntero, int C, int conjunto, int n) {
       //Reacomodamos
       reacomodar(puntero[conjunto],0,position);
 
-
-      p("\n--------------------- VECTOR ------------------\n");
-      for(int i = C; i >= 0; i--) {
-        printf("%i\n",puntero[conjunto][i]);
-      }
-      p("\n------------------- //VECTOR ------------------\n");
-
       //Termina el flujo y se retorna el elemento que se va a cambiar
       return tmp;
     }
@@ -299,16 +345,11 @@ int getLRU(int **puntero, int C, int conjunto, int n) {
     reacomodar(puntero[conjunto],existe,position);
   }
 
-  p("\n--------------------- VECTOR ------------------\n");
-  for(int i = C; i >= 0; i--) {
-    printf("%i\n",puntero[conjunto][i]);
-  }
-  p("\n------------------- //VECTOR ------------------\n");
-
   //Al final siempre estará el elemento a reemplazar en la posición 0 (el fondo)
   return puntero[conjunto][0];
 }
 
+// Simulador
 void simulador(int *config) {
 
   //Tamaño del caché (en bloques)
@@ -363,6 +404,10 @@ void simulador(int *config) {
   };
 
   system(CLS);
+
+  char algoritmos[3][10] = {"LRU", "FIFO", "RAND"};
+
+  printf("ALGORITMO DE REEMPLAZO: %s\n\n",algoritmos[config[2]]);
   p("A continuacion introducir las secuencias, escribir la secuencia \"0\" para finalizar la simulacion.\n\n");
 
   // hacer secuencias
@@ -382,7 +427,13 @@ void simulador(int *config) {
       switch (config[2]) {
         case 0:
           LRU(
-            getLRU(punteroLRU, C- 1, conjunto_position, number)
+            getLRU(punteroLRU, C- 1, conjunto_position, number),
+            cache,
+            number,
+            conjunto_position,
+            mC,
+            fallas,
+            &aciertos
           );
         break;
         case 1:
