@@ -26,7 +26,10 @@ void returnMenu();
 int randomize(int cantidad);
 
 /**
+  * Obtiene el exponente de un número que se puede expresar en base 2
+  *
   * @param int N: Recibe un número que se puede expresar en base de 2^n
+  *
   * @return devuelve el exponente n
 */
 int expoDos(int N) {
@@ -41,7 +44,11 @@ int expoDos(int N) {
 
 /**
   * Crea una estructura de tipo caché (matriz fil*col) en tiempo de ejecución.
-  * Retorna una matriz NO dinámica, con fil y col de tamaño.
+  *
+  * @param int fil: Tamaño de las filas
+  * @param int col: Tamaño de las columnas
+  *
+  * @return int **: Retorna una matriz NO dinámica, con fil y col de tamaño.
 */
 int **create_cache_struct(int fil, int col) {
     int **m = NULL;
@@ -61,7 +68,10 @@ int **create_cache_struct(int fil, int col) {
 
 /**
   * Crea una estructura de memoria (vector N) en tiempo de ejecución.
-  * Retorna un vector de tamaño N.
+  *
+  * @param int N: N es el tamaño del vector a crear.
+  *
+  * @return char *: Retorna un vector de tamaño N.
 */
 char *create_memory_struct(int N) {
   char *v = NULL;
@@ -72,7 +82,12 @@ char *create_memory_struct(int N) {
 
 /**
   * Define si un elemento entero está dentro de un vector que también es de tipo entero.
-  * Devuelve la posición en la que se encuentra, en caso de que no se encuentre devuelve -1.
+  *
+  * @param int e: Elemento a buscar
+  * @param int *vector: Vector en el que se va a buscar
+  * @param int N: Tamaño del vector pasado por int *vector
+  *
+  * @return int: Devuelve la posición en la que se encuentra, en caso de que no se encuentre devuelve -1.
 */
 int in_array_position(int e, int *vector, int N) {
   for(int i = 0; i < N; i++) {
@@ -86,7 +101,12 @@ int in_array_position(int e, int *vector, int N) {
 
 /**
   * Define si un elemento entero está dentro de un vector que también es de tipo entero.
-  * Devuelve el macro TRUE en caso de ser cierto, y el macro FALSE en caso de no estar.
+  *
+  * @param int e: Elemento a buscar
+  * @param int *vector: Vector en el que se va a buscar
+  * @param int N: Tamaño del vector pasado por int *vector
+  *
+  * @return int: Devuelve el macro TRUE en caso de ser cierto, y el macro FALSE en caso de no estar.
 */
 short int in_array(int e, int *vector, int N) {
   for(int i = 0; i < N; i++) {
@@ -122,9 +142,11 @@ int binToInt(char *bin, int size) {
 
 /**
   * Transforma un número decimal a un número binario.
+  *
   * @param int n: Entero a transformar
   * @param int BITS: Cantidad de bits de resultado (32 bits por ejemplo)
-  * Retorna un char * de tamaño BITS + 1 y el binario con ceros a la izquierda
+  *
+  * @return char *: Retorna un char * de tamaño BITS + 1 y el binario con ceros a la izquierda
 */
 char *bin(int n, int BITS) {
    int c, d, count = 0;
@@ -213,12 +235,18 @@ void getUnity(int *unity, int *uOptions, char *type) {
   }
 }
 
-//Reducción de printf(STRING)
+/**
+  * Reducción de printf(STRING)
+  *
+  * @param char *string: String a escribir
+*/
 void p(char *string) {
   printf("%s",string);
 }
 
-//Retorna de forma recursiva al menú inicial
+/**
+  * Retorna de forma recursiva al menú inicial
+*/
 void returnMenu(){
   p("Para volver al menu introducir (1), para salir introducir (0): ");
   short int o;
@@ -232,7 +260,13 @@ void returnMenu(){
   }
 }
 
-//Genera un número random entre 0 y cantidad-1
+/**
+  * Genera un número random entre 0 y cantidad-1
+  *
+  * @param int cantidad: Cantidad hasta donde se desea generar el random
+  *
+  * @return retorna un entero con el número random
+*/
 int randomize(int cantidad) {
   srand(time(NULL));
   return rand() % cantidad;
