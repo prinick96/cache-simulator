@@ -256,6 +256,7 @@ void LRU(int replace, int **cache, int n, int conjunto, int mC, int *fallas, int
     fallas[2]++;
     printf("\n%i falla por conflicto (-%i)",n,cache[conjunto][position]);
 
+
     cache[conjunto][position] = n;
   }
 }
@@ -319,6 +320,8 @@ int getLRU(int **puntero, int C, int conjunto, int n) {
   //Si está lleno, o simplemente existe el elemento hay que reordenar el vector del conjunto
   else {
 
+    printf("%i y C %i\n",position, C);
+
     //Si está lleno, position tiene un exceso en 1.
     if(position == C + 1) {
       position = C;
@@ -371,7 +374,7 @@ void simulador(int *config) {
     punteroFifo = (int *) malloc(sizeof(int)*C);
 
     //Puntero de LRU (matriz de Cojunto x Conjunto)
-    int **punteroLRU = create_cache_struct(C,C);
+    int **punteroLRU = create_cache_struct(C,mC);
 
     //Chequeamos el puntero LRU
     if(NULL == punteroLRU) {
@@ -432,7 +435,7 @@ void simulador(int *config) {
           switch (config[2]) {
             case 0:
               LRU(
-                getLRU(punteroLRU, C- 1, conjunto_position, number),
+                getLRU(punteroLRU, mC - 1, conjunto_position, number),
                 cache,
                 number,
                 conjunto_position,
