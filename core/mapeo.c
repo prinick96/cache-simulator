@@ -38,11 +38,6 @@ int showCacheStruct(char *cache, int size, int showInternal, const int *componen
     //Obtengo un binario de "size" bits completado con ceros a la izquierda
     char *mem_dir = bin(dir,size - 1);
 
-    if(NULL == mem_dir) {
-      printf("NO SE PUDO RESERVAR MEMORIA PARA EL BINARIO.");
-      exit(EXIT_FAILURE);
-    }
-
     //LLenamos el caché
     for(int i = size - 1; i >= 0; i--) {
       cache[i] = mem_dir[(size - 1) - i];
