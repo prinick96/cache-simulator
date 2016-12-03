@@ -355,125 +355,145 @@ void simulador(int *config) {
   //Tamaño del caché (en bloques)
   int mC = expoDos(config[0]);
   //Conjuntos
+  //int C = (int) ceil(config[0] / config[1]);
   int C = config[1];
-  //Caché (Conjuntos x Memoria) (inicializa todas las posiciones con el valor cero por defecto)
-  int **cache = create_cache_struct(C,mC);
 
-  //Número de la secuencia
-  int number = -1;
+  // Si el tamaño de conjuntos es mayor a cero, es porque se puede crear la memoria caché
+  if(C > 0) {
+    //Caché (Conjuntos x Memoria) (inicializa todas las posiciones con el valor cero por defecto)
+    int **cache = create_cache_struct(C,mC);
 
-  //Puntero de FIFO (vector con la altura de la cantidad de conjuntos)
-  int *punteroFifo = NULL;
-  punteroFifo = (int *) malloc(sizeof(int)*C);
+    //Número de la secuencia
+    int number = -1;
 
-  //Puntero de LRU (matriz de Cojunto x Conjunto)
-  int **punteroLRU = create_cache_struct(C,C);
+    //Puntero de FIFO (vector con la altura de la cantidad de conjuntos)
+    int *punteroFifo = NULL;
+    punteroFifo = (int *) malloc(sizeof(int)*C);
 
-  //Chequeamos el puntero LRU
-  if(NULL == punteroLRU) {
-    p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON LRU()\n");
-    exit(EXIT_FAILURE);
-  }
+    //Puntero de LRU (matriz de Cojunto x Conjunto)
+    int **punteroLRU = create_cache_struct(C,C);
 
-  //Chequeamos el puntero FIFO
-  if(NULL == punteroFifo && 1 == config[2]) {
-    p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON FIFO()\n");
-    exit(EXIT_FAILURE);
-  } else {
-    //Rellenamos el puntero.
-    for(int i = 0; i < C; i++) {
-      punteroFifo[i] = -1;
+    //Chequeamos el puntero LRU
+    if(NULL == punteroLRU) {
+      p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON LRU()\n");
+      exit(EXIT_FAILURE);
     }
-  }
 
-  /** FALLAS:
-    * [0]: Fallas forzosas
-    * [1]: Fallas por capacidad
-    * [2]: Fallas por conflicto
-  */
-  int fallas[3] = {0,0,0};
-  int solicitudes = 0;
-  int aciertos = 0;
-  int conjunto_position = 0;
-  int mapConfig[6] = {
-    1, //mapeo asociativo por conjunto
-    256, //memoria principal (de relleno nada más, no usable para el algoritmo)
-    config[0], //tamaño de memoria cache
-    1, //tamaño de cada bloque (porque la memoria caché está definida como tamaño en bloques)
-    config[1], //tamaño del conjunto
-  };
+    //Chequeamos el puntero FIFO
+    if(NULL == punteroFifo && 1 == config[2]) {
+      p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON FIFO()\n");
+      exit(EXIT_FAILURE);
+    } else {
+      //Rellenamos el puntero.
+      for(int i = 0; i < C; i++) {
+        punteroFifo[i] = -1;
+      }
+    }
 
-  system(CLS);
+    /** FALLAS:
+      * [0]: Fallas forzosas
+      * [1]: Fallas por capacidad
+      * [2]: Fallas por conflicto
+    */
+    int fallas[3] = {0,0,0};
+    int solicitudes = 0;
+    int aciertos = 0;
+    int conjunto_position = 0;
+    int mapConfig[6] = {
+      1, //mapeo asociativo por conjunto
+      256, //memoria principal (de relleno nada más, no usable para el algoritmo)
+      config[0], //tamaño de memoria cache
+      1, //tamaño de cada bloque (porque la memoria caché está definida como tamaño en bloques)
+      config[1], //tamaño del conjunto
+    };
 
-  char algoritmos[3][10] = {"LRU", "FIFO", "RAND"};
+    system(CLS);
 
-  printf("ALGORITMO DE REEMPLAZO: %s\n\n",algoritmos[config[2]]);
-  p("A continuacion introducir las secuencias, escribir la secuencia \"0\" para finalizar la simulacion.\n\n");
+    char algoritmos[3][10] = {"LRU", "FIFO", "RAND"};
 
-  // hacer secuencias
-  while (number != 0) {
+    printf("ALGORITMO DE REEMPLAZO: %s\n\n",algoritmos[config[2]]);
+    p("A continuacion introducir las secuencias, escribir la secuencia \"0\" para finalizar la simulacion.\n\n");
 
-    printf("Secuencia %i: ", solicitudes + 1);
-    scanf("%d",&number);
-    //Número
-    mapConfig[5] = number;
+    // hacer secuencias
+    while (number != 0) {
 
-    //Obtengo la posición en el conjunto que corresponda al número haciendo el mapeo del mismo
-    conjunto_position = mapeo(mapConfig,1,0);
+      printf("Secuencia %i: ", solicitudes + 1);
+      scanf("%d",&number);
+      //Número
+      mapConfig[5] = number;
 
-    if(0 != number) {
+      //Obtengo la posición en el conjunto que corresponda al número haciendo el mapeo del mismo
+      conjunto_position = mapeo(mapConfig,1,0);
 
-      //Política de reemplazo
-      switch (config[2]) {
-        case 0:
-          LRU(
-            getLRU(punteroLRU, C- 1, conjunto_position, number),
-            cache,
-            number,
-            conjunto_position,
-            mC,
-            fallas,
-            &aciertos
-          );
-        break;
-        case 1:
-          FIFO(
-            cache,
-            punteroFifo,
-            number,
-            conjunto_position,
-            mC,
-            fallas,
-            &aciertos
-          );
-        break;
-        default:
-          RANDOM(
-            cache,
-            number,
-            conjunto_position,
-            mC,
-            fallas,
-            &aciertos
-          );
-        break;
+      if(0 != number) {
+
+        if(conjunto_position < C) {
+          //Política de reemplazo
+          switch (config[2]) {
+            case 0:
+              LRU(
+                getLRU(punteroLRU, C- 1, conjunto_position, number),
+                cache,
+                number,
+                conjunto_position,
+                mC,
+                fallas,
+                &aciertos
+              );
+            break;
+            case 1:
+              FIFO(
+                cache,
+                punteroFifo,
+                number,
+                conjunto_position,
+                mC,
+                fallas,
+                &aciertos
+              );
+            break;
+            default:
+              RANDOM(
+                cache,
+                number,
+                conjunto_position,
+                mC,
+                fallas,
+                &aciertos
+              );
+            break;
+          }
+        }
+
+        //Si no existe conjunto posible para el bloque, generamos falla por capacidad
+        else {
+          printf("\n%i falla por capacidad",number);
+          fallas[1]++;
+        }
+
+
+        p("\n\n");
+        showCache(cache,C,mC);
+        p("\n------------------------------------------------------------\n");
+
+        solicitudes++;
       }
 
-      p("\n\n");
-      showCache(cache,C,mC);
-      p("\n------------------------------------------------------------\n");
-
-      solicitudes++;
     }
 
+    //Estadísticas
+    showStats(fallas,solicitudes,aciertos);
+
+    //Liberamos memoria
+    free(cache);
+    free(punteroFifo);
+    free(punteroLRU);
   }
 
-  //Estadísticas
-  showStats(fallas,solicitudes,aciertos);
-
-  //Liberamos memoria
-  free(cache);
-  free(punteroFifo);
+  // Si C == 0 entonces, la capacidad del caché es insuficiente para esa configuración de conjuntos
+  else {
+    p("\nLa memoria cache es muy pequenia para los conjuntos asignados.\n");
+  }
 
   //Fin
   p("\nTermino la simulacion\n");

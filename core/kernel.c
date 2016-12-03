@@ -150,11 +150,11 @@ int binToInt(char *bin, int size) {
 */
 char *bin(int n, int BITS) {
    int c, d, count = 0;
-   char *pointer = (char*)malloc(BITS+1);
+   char *pointer = (char*)malloc(sizeof(char *)*(BITS+1));
 
    // Por si no hay memoria
    if ( NULL == pointer ) {
-     p("No hay memoria para reservar el numero binario.");
+     p("\nNo hay memoria para reservar el numero binario bin(int n, int BITS).");
      exit(EXIT_FAILURE);
    }
 

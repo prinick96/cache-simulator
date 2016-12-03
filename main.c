@@ -30,8 +30,10 @@ int *basics(int *config) {
   };
   // Opciones posibles de la memoria caché
   int mCOptions[5] = {64,128,256,512,1024};
+  //int mCOptions[5] = {32,128,256,512,1024};
   // Opciones posibles para los bloques
   int BOptions[5] = {2,4,8,16,32};
+  //int BOptions[5] = {1,4,8,16,32};
 
   p("Tipo de mapeo (0) Directo (1) Asociativo: ");
   scanf("%i",&config[0]);
@@ -157,6 +159,14 @@ int main() {
       case 1:
         // Ubicación de bloques
         m2( basics(config) );
+/*        config[0] = 1;
+        config[1] = 64;
+        config[2] = 64;
+        config[3] = 1;
+        config[4] = 16;
+        config[5] = 33;
+        mapeo( config, 1, 1);
+*/
       break;
       case 2:
         // Simulador de reemplazo de bloques
