@@ -320,8 +320,6 @@ int getLRU(int **puntero, int C, int conjunto, int n) {
   //Si está lleno, o simplemente existe el elemento hay que reordenar el vector del conjunto
   else {
 
-    printf("%i y C %i\n",position, C);
-
     //Si está lleno, position tiene un exceso en 1.
     if(position == C + 1) {
       position = C;
