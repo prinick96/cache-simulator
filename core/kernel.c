@@ -7,7 +7,7 @@
 //Macros
 #define TRUE 1
 #define FALSE 0
-#define CLS "cls"
+#define CLS "cls" //Cambiar a "clear" para que el proyecto ande en Linux
 
 //Instance
 void getUnity(int *unity, int *uOptions, char *type);
@@ -34,11 +34,12 @@ int randomize(int cantidad);
 */
 int expoDos(int N) {
   int n = 0;
-
+  //Descompongo y la vez voy viendo cuantas divisiones hago
   for(N = N; N > 0; N = (int) ceil(N / 2)) {
     n++;
   }
 
+  // Quito uno al exceso que quedó después del for
   return n - 1;
 }
 
@@ -56,7 +57,7 @@ int **create_cache_struct(int fil, int col) {
     // Se crea la malla
     m = (int**) calloc(fil, sizeof(int *));
 
-    //Se reserva memoria para la tabla de punteros intermedia
+    //Se reserva memoria para los vectores de cada posición
     if (NULL != m){
         for (int i= 0 ; i < fil; i++){
           m[i] = (int *) calloc(col, sizeof(int));
@@ -77,6 +78,12 @@ char *create_memory_struct(int N) {
   char *v = NULL;
   v = (char*) malloc(N*sizeof(char));
 
+  //Salimos del programa si no hay memoria
+  if(NULL == v) {
+    printf("No se ha podido reservar memoria para create_memory_struct(%i)",N);
+    exit(EXIT_FAILURE);
+  }
+
   return v;
 }
 
@@ -90,12 +97,15 @@ char *create_memory_struct(int N) {
   * @return int: Devuelve la posición en la que se encuentra, en caso de que no se encuentre devuelve -1.
 */
 int in_array_position(int e, int *vector, int N) {
+  //Recorro el vector
   for(int i = 0; i < N; i++) {
+    //Si ya lo encontré detengo la ejecución y devuelvo esa posición
     if(e == vector[i]) {
       return i;
     }
   }
 
+  //Se recorrió todo, no estaba
   return -1;
 }
 
@@ -109,12 +119,15 @@ int in_array_position(int e, int *vector, int N) {
   * @return int: Devuelve el macro TRUE en caso de ser cierto, y el macro FALSE en caso de no estar.
 */
 short int in_array(int e, int *vector, int N) {
+  //Recorro el vector
   for(int i = 0; i < N; i++) {
+    //Si ya lo encontré detengo la ejecución y devuelvo TRUE
     if(e == vector[i]) {
       return TRUE;
     }
   }
 
+  //Se recorrió todo, no estaba
   return FALSE;
 }
 
@@ -128,7 +141,7 @@ short int in_array(int e, int *vector, int N) {
 */
 int binToInt(char *bin, int size) {
   int dec = 0;
-
+  //Recorro el binario y voy haciendo: 1*2^7 + 1*2^6 + 0*2^5 ... etc
   for(int i = 0; i < size; i++) {
     if(bin[i] == '1') {
       dec = dec * 2 + 1;
@@ -150,11 +163,12 @@ int binToInt(char *bin, int size) {
 */
 char *bin(int n, int BITS) {
    int c, d, count = 0;
-   char *pointer = (char*)malloc(sizeof(char *)*(BITS+1));
+   char *pointer = NULL;
+   pointer = (char*)malloc(sizeof(char *)*(BITS+1));
 
    // Por si no hay memoria
    if ( NULL == pointer ) {
-     p("\nNo hay memoria para reservar el numero binario bin(int n, int BITS).");
+     printf("\nNo hay memoria para reservar el numero binario bin(int %i, int %i)",n,BITS);
      exit(EXIT_FAILURE);
    }
 
@@ -162,10 +176,7 @@ char *bin(int n, int BITS) {
       // desplazamos bits hacia la derecha
       d = n >> c;
 
-      /*
-        Operación "AND" lógica, hace con los bits de "d" y "1" lo que pasaría si los colocamos en
-        una tabla AND de lógica, sólo cuando sea 1 y 1 cada bit, dará 1.
-      */
+      //Decido que poner 0 / 1 y que me sirva para el complemento
       if ( d & 1 ) {
         *(pointer + count) = 1 + '0';
       } else {
@@ -191,8 +202,10 @@ char *bin(int n, int BITS) {
   * @param int nOptions: Tamaño del vector options
 */
 int *iReplace(int *config, int *options, int D, int N, int nOptions) {
+  //Si no está entre los permietidos, se reemplaza y se muestra el mensaje
   if(!in_array(config[N],options,nOptions)) {
     printf("Los %i bytes no son una cantidad permitida, se ha colocado %i bytes\n",config[N],D);
+    //Reemplazo
     config[N] = D;
   }
 
@@ -209,14 +222,17 @@ int *iReplace(int *config, int *options, int D, int N, int nOptions) {
 */
 int setUnity(int N, int U) {
   switch (U) {
+    //Kbytes
     case 1:
       N = N * 1024;
     break;
+    //Mbytes
     case 2:
       N = N * 1024 * 1024;
     break;
   }
 
+  //default: Bytes
   return N;
 }
 
@@ -248,8 +264,8 @@ void p(char *string) {
   * Retorna de forma recursiva al menú inicial
 */
 void returnMenu(){
-  p("Para volver al menu introducir (1), para salir introducir (0): ");
-  short int o;
+  p("Para volver al menu introducir (1), para salir introducir (-1): ");
+  int o;
   scanf("%i",&o);
 
   if(o == 1) {
@@ -268,7 +284,9 @@ void returnMenu(){
   * @return retorna un entero con el número random
 */
 int randomize(int cantidad) {
+  //Genero la semilla
   srand(time(NULL));
+  //Que salga el número
   return rand() % cantidad;
 }
 

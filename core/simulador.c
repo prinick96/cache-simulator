@@ -10,7 +10,9 @@ void showCache(int **cache, int C, int mC) {
   for(int i = 0; i < C; i++) {
     printf("CONJUNTO %i:",i);
     for(int j = 0; j < mC; j++) {
-      if(cache[i][j] != 0) {
+      //if(cache[i][j] != 0) {
+      //El -1 es el que especifica el vacío ahora
+      if(cache[i][j] != -1) {
         printf("[%i]",cache[i][j]);
       } else {
         p("[  ]");
@@ -98,7 +100,9 @@ void FIFO(int **cache, int *puntero, int n, int conjunto, int mC, int *fallas, i
       }
 
       //En caso de que no se consiga (se llega a alguna posición vacía), se introduce en caché y genera una falla forzosa
-      else if (cache[conjunto][i] == 0) {
+      //else if (cache[conjunto][i] == 0) {
+      //Cambiamos a -1 la condición vacía
+      else if (cache[conjunto][i] == -1) {
         printf("\n%i falla forzosa",n);
         cache[conjunto][i] = n;
         fallas[0]++;
@@ -162,7 +166,9 @@ void RANDOM(int **cache, int n, int conjunto, int mC, int *fallas, int *aciertos
       Si la posición está vacía, entonces se asigna el elemento a esa posición,
       genera un falla forzosa y detenemos el recorrido del caché.
     */
-    if(cache[conjunto][i] == 0) {
+    //if(cache[conjunto][i] == 0) {
+    //Cambiamos el -1 la condición vacía
+    if(cache[conjunto][i] == -1) {
       printf("\n%i falla forzosa",n);
       cache[conjunto][i] = n;
       fallas[0]++;
@@ -224,7 +230,9 @@ void LRU(int replace, int **cache, int n, int conjunto, int mC, int *fallas, int
       Si la posición está vacía, entonces se asigna el elemento a esa posición,
       genera un falla forzosa y detenemos el recorrido del caché.
     */
-    if(cache[conjunto][i] == 0) {
+    //if(cache[conjunto][i] == 0) {
+    //Cambiamos por -1 la condición vacía
+    if(cache[conjunto][i] == -1) {
       printf("\n%i falla forzosa",n);
       cache[conjunto][i] = n;
       fallas[0]++;
@@ -303,7 +311,9 @@ int getLRU(int **puntero, int C, int conjunto, int n) {
   int existe = 0, position = 0;
   //Revisamos si está vacío o hay espacios vacíos
   for(int i = 0; i <= C; i++, position++) {
-    if(puntero[conjunto][i] == 0) {
+    //if(puntero[conjunto][i] == 0) {
+    //Cambiamos a -1 la condición vacía
+    if(puntero[conjunto][i] == -1) {
       //Si está vacío, la posición de inserción será i=position y detenemos el bucle;
       break;
     }
@@ -365,7 +375,8 @@ void simulador(int *config) {
     int **cache = create_cache_struct(C,mC);
 
     //Número de la secuencia
-    int number = -1;
+    //int number = -1;
+    int number = 0;
 
     //Puntero de FIFO (vector con la altura de la cantidad de conjuntos)
     int *punteroFifo = NULL;
@@ -378,6 +389,15 @@ void simulador(int *config) {
     if(NULL == punteroLRU) {
       p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON LRU()\n");
       exit(EXIT_FAILURE);
+    } else {
+      //Rellenamos el puntero.
+      for(int i = 0; i < C; i++) {
+        for(int j = 0; j < mC; j++) {
+          punteroLRU[i][j] = -1;
+          //Aprovechamos y llenamos el caché de -1 en este mismo bucle
+          cache[i][j] = -1;
+        }
+      }
     }
 
     //Chequeamos el puntero FIFO
@@ -413,10 +433,13 @@ void simulador(int *config) {
     char algoritmos[3][10] = {"LRU", "FIFO", "RAND"};
 
     printf("ALGORITMO DE REEMPLAZO: %s\n\n",algoritmos[config[2]]);
-    p("A continuacion introducir las secuencias, escribir la secuencia \"0\" para finalizar la simulacion.\n\n");
+    //p("A continuacion introducir las secuencias, escribir la secuencia \"0\" para finalizar la simulacion.\n\n");
+    p("A continuacion introducir las secuencias, escribir la secuencia \"-1\" para finalizar la simulacion.\n\n");
 
     // hacer secuencias
-    while (number != 0) {
+    //while (number != 0) {
+    // Cambiamos la condición de salida a -1
+    while (number != -1) {
 
       printf("Secuencia %i: ", solicitudes + 1);
       scanf("%d",&number);
@@ -426,7 +449,9 @@ void simulador(int *config) {
       //Obtengo la posición en el conjunto que corresponda al número haciendo el mapeo del mismo
       conjunto_position = mapeo(mapConfig,1,0);
 
-      if(0 != number) {
+      //if(0 != number) {
+      // Cambiamos la condición de salida a -1
+      if(-1 != number) {
 
         if(conjunto_position < C) {
           //Política de reemplazo

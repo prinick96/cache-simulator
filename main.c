@@ -135,7 +135,7 @@ void m3(int *config) {
 int main() {
   system(CLS);
   // Variable para capturar la opción del menú
-  short int op;
+  int op;
   // Opciones posibles
   int options[3] = {1,2,3};
   // Configuración
@@ -159,14 +159,6 @@ int main() {
       case 1:
         // Ubicación de bloques
         m2( basics(config) );
-/*        config[0] = 1;
-        config[1] = 64;
-        config[2] = 64;
-        config[3] = 1;
-        config[4] = 16;
-        config[5] = 33;
-        mapeo( config, 1, 1);
-*/
       break;
       case 2:
         // Simulador de reemplazo de bloques
