@@ -382,6 +382,12 @@ void simulador(int *config) {
     int *punteroFifo = NULL;
     punteroFifo = (int *) malloc(sizeof(int)*C);
 
+    //Chequeamos el puntero FIFO
+    if(NULL == punteroFifo && 1 == config[2]) {
+      p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON FIFO()\n");
+      exit(EXIT_FAILURE);
+    }
+
     //Puntero de LRU (matriz de Cojunto x Conjunto)
     int **punteroLRU = create_cache_struct(C,mC);
 
@@ -397,16 +403,7 @@ void simulador(int *config) {
           //Aprovechamos y llenamos el caché de -1 en este mismo bucle
           cache[i][j] = -1;
         }
-      }
-    }
-
-    //Chequeamos el puntero FIFO
-    if(NULL == punteroFifo && 1 == config[2]) {
-      p("\n NO SE PUDO RESERVAR MEMORIA PARA COMENZAR CON FIFO()\n");
-      exit(EXIT_FAILURE);
-    } else {
-      //Rellenamos el puntero.
-      for(int i = 0; i < C; i++) {
+        //Aprovechamos el bucle y llenamos el puntero del fifo
         punteroFifo[i] = -1;
       }
     }
@@ -514,11 +511,6 @@ void simulador(int *config) {
     free(cache);
     free(punteroFifo);
     free(punteroLRU);
-  }
-
-  // Si C == 0 entonces, la capacidad del caché es insuficiente para esa configuración de conjuntos
-  else {
-    p("\nLa memoria cache es muy pequenia para los conjuntos asignados.\n");
   }
 
   //Fin
